@@ -1,0 +1,21 @@
+npm install --save express 
+npm install --save body-parser
+npm install express-validator -save
+npm install method-override -save
+npm install express-flash -save
+npm install cookie-parser -save
+npm install express-session -save
+npm install ejs -save
+npm install mysql -save
+npm install express-myconnection -save
+
+#Use above module and install one by one OR install all of them once
+
+npm install --save express body-parser express-validator  method-override express-flash cookie-parser express-session ejs mysql express-myconnection
+
+----------------------------------------------------------------------------
+
+
+https://github.com/avibhardwaj243/user_crud_node_express_mysql.git
+
+http://blog.chapagain.com.np/node-js-express-mysql-simple-add-edit-delete-view-crud/
