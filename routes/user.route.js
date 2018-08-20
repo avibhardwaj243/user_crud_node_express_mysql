@@ -15,4 +15,6 @@ router.get('/edit/:id', user_controller.edit_form);//R
 router.put('/edit/:id', user_controller.user_update);//U
 router.delete('/delete/:id', user_controller.user_delete);//D
 
+router.get('/sort/:type/:orderby', user_controller.index);//R
+
 module.exports = router;

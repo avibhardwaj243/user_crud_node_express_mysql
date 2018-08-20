@@ -2,12 +2,34 @@ const User = require('../models/user.model');
 
 exports.index = function(req, res, next){
    req.getConnection(function(error, conn) {
-        conn.query('SELECT * FROM users ORDER BY id DESC',function(err, rows, fields) {
+        var orderBy = "DESC";
+        var orderByColumn = "id";
+        var orderByArg = "desc";
+        if(req.params.type != undefined && req.params.type != null){
+            if(req.params.type == "nme"){
+               orderByColumn = "name";
+            } else if(req.params.type == "ag"){
+               orderByColumn = "age";
+            } else if(req.params.type == "eml"){
+               orderByColumn = "email";
+            }
+        }
+        if(req.params.orderby != undefined && req.params.orderby != null){
+            if(req.params.orderby == "desc"){
+                orderBy = "DESC";
+                orderByArg = "asc";
+            } else if(req.params.orderby == "asc"){
+                orderBy = "ASC";
+                orderByArg = "desc";
+            }
+        }
+        var query = 'SELECT * FROM users ORDER BY ' + orderByColumn + ' ' +orderBy; 
+        conn.query(query,function(err, rows, fields) {
             if (err) {
                 req.flash('error', err)
                 res.render('user/list', {title: 'User List', data: ''});
             } else {
-                res.render('user/list', {title: 'User List', data: rows});
+                res.render('user/list', {title: 'User List', data: rows, orderBY:orderByArg});
             }
         })
     });
