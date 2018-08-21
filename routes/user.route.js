@@ -17,4 +17,6 @@ router.delete('/delete/:id', user_controller.user_delete);//D
 
 router.get('/sort/:type/:orderby', user_controller.index);//R
 
+router.get('/search', user_controller.index);//R
+
 module.exports = router;
