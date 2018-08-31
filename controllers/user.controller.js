@@ -1,7 +1,8 @@
-const User = require('../models/user.model');
+const userModel = require('../models/user.model');
 
 exports.index = function(req, res, next){
    req.getConnection(function(error, conn) {
+       var userModelObj = new userModel(conn);
        var searchWhere = ' 1 ';
        var searchName = '';
        var searchEmail = '';
@@ -40,9 +41,10 @@ exports.index = function(req, res, next){
                 orderByArg = "desc";
             }
         }
+       
         var query = 'SELECT * FROM users WHERE '+ searchWhere +' ORDER BY ' + orderByColumn + ' ' +orderBy;
-        conn.query(query,function(err, rows, fields) {
-            if (err) {
+        userModelObj.executeQuery(query, function(err, rows){
+            if(err){
                 //res.send({title: 'User List', message : 'Some Error Has occured : ' + err, data: ''});
                 req.flash('error', err)
                 res.render('user/list', {title: 'User List', data: ''});
@@ -50,7 +52,7 @@ exports.index = function(req, res, next){
                 //res.send({title: 'User List', data: rows, orderBY:orderByArg, s1:searchName, s2:searchAge, s3:searchEmail});
                 res.render('user/list', {title: 'User List', data: rows, orderBY:orderByArg, s1:searchName, s2:searchAge, s3:searchEmail});
             }
-        })
+        });
     });
 };
 
@@ -75,8 +77,11 @@ exports.user_add = function(req, res, next){
         }
 
         req.getConnection(function(error, conn) {
-            conn.query('INSERT INTO users SET ?', user, function(err, result) {
-                if (err) {
+            var userModelObj = new userModel(conn);
+                        
+            var query = 'INSERT INTO users SET ? ';
+            userModelObj.executeQueryModify(query, user, function(err, rows){
+                if(err){
                     //res.send({title: 'User Add', message : 'Some Error Has occured : ' + err});
                     req.flash('error', err)
                     res.render('user/add', {
@@ -95,7 +100,7 @@ exports.user_add = function(req, res, next){
                         email: ''
                     })
                 }
-            })
+            });
         })
     }
     else {   //Display errors to user
@@ -118,26 +123,32 @@ exports.user_add = function(req, res, next){
 // SHOW EDIT USER FORM
 exports.edit_form = function(req, res, next){
     req.getConnection(function(error, conn) {
-        conn.query('SELECT * FROM users WHERE id = ' + req.params.id, function(err, rows, fields) {
-            if(err) throw err
-
-            if (rows.length <= 0) {
-                //res.send({title: 'View User', message : 'User not found with id = ' + req.params.id});
-                req.flash('error', 'User not found with id = ' + req.params.id)
-                res.redirect('/user')
+        var userModelObj = new userModel(conn);
+        
+        var query = 'SELECT * FROM users WHERE id = ' + req.params.id;
+        userModelObj.executeQuery(query, function(err, rows){
+            if(err){
+                //res.send({title: 'User List', message : 'Some Error Has occured : ' + err, data: ''});
+                throw err;
+            } else {
+                //res.send({title: 'User List', data: rows, orderBY:orderByArg, s1:searchName, s2:searchAge, s3:searchEmail});
+                if (rows.length <= 0) {
+                    //res.send({title: 'View User', message : 'User not found with id = ' + req.params.id});
+                    req.flash('error', 'User not found with id = ' + req.params.id)
+                    res.redirect('/user')
+                } else {
+                    res.render('user/edit', {
+                        title: 'Edit User',
+                        //data: rows[0],
+                        id: rows[0].id,
+                        name: rows[0].name,
+                        age: rows[0].age,
+                        email: rows[0].email
+                    });
+                    //res.send({title: 'View User', data : rows});
+                }
             }
-            else {
-                res.render('user/edit', {
-                    title: 'Edit User',
-                    //data: rows[0],
-                    id: rows[0].id,
-                    name: rows[0].name,
-                    age: rows[0].age,
-                    email: rows[0].email
-                });
-                //res.send({title: 'View User', data : rows});
-            }
-        })
+        });
     })
 };
 
@@ -157,8 +168,11 @@ exports.user_update = function(req, res, next){
         }
 
         req.getConnection(function(error, conn) {
-            conn.query('UPDATE users SET ? WHERE id = ' + req.params.id, user, function(err, result) {
-                if (err) {
+            var userModelObj = new userModel(conn);
+            
+            var query = 'UPDATE users SET ? WHERE id = ' + req.params.id;
+            userModelObj.executeQueryModify(query, user, function(err, rows){
+                if(err){
                     //res.send({title: 'Update User', message : 'Some Error has accoured ' + err});
                     req.flash('error', err);
                     res.render('user/edit', {
@@ -179,7 +193,7 @@ exports.user_update = function(req, res, next){
                         email: req.body.email
                     });
                 }
-            })
+            });
         })
     }
     else {   //Display errors to user
@@ -203,8 +217,11 @@ exports.user_update = function(req, res, next){
 exports.user_delete = function(req, res, next){
     var user = { id: req.params.id }
     req.getConnection(function(error, conn) {
-        conn.query('DELETE FROM users WHERE id = ' + req.params.id, user, function(err, result) {
-            if (err) {
+        var userModelObj = new userModel(conn);
+        
+        var query = 'DELETE FROM users WHERE id = ' + req.params.id;
+        userModelObj.executeQueryModify(query, user, function(err, rows){
+            if(err){
                 //res.send({title: 'Delete User', message : 'Some Error has accoured ' + err});
                 req.flash('error', err);
                 res.redirect('/user');
@@ -213,6 +230,6 @@ exports.user_delete = function(req, res, next){
                 req.flash('success', 'User deleted successfully! id = ' + req.params.id);
                 res.redirect('/user');
             }
-        })
+        });
     })
 };
