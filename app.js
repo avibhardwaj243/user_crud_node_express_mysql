@@ -33,7 +33,7 @@ app.use(session({
 }));
 app.use(flash());
 
-var config = require('./config')
+var config = require('./config_local')
 var dbOptions = {
     host:      config.database.host,
     user:       config.database.user,
@@ -58,7 +58,7 @@ app.use('/index', index);
 const user = require('./routes/user.route'); // Imports routes for the index
 app.use('/user', user);
 
-var port = 12345;
+var port = 3000;
 app.listen(port, () => {
-   console.log('Server is up and running at '+port+' URL : http://127.0.0.1:'+port);
+   console.log('Server is up and running at '+port);
 });
